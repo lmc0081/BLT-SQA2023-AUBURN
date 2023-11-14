@@ -1,0 +1,7 @@
+**Activities and lessons learned:**
+
+**Laura Cromwell**: I did part 4c, integrating forensics. I created a logging object and found 5 methods within graphtaint.py to add forensics to where files were read and data structures were accessed. I learned that logging is important to track when resources were accessed or updated to keep your software secure. 
+
+**Brooke Hopton-Jones**: I did part 4a - creating a Git Hook that runs and reports all security weaknesses into gitHook.csv. The file has reports of 17 security weaknessses between the constants.py, parser.py, and TEST_CONSTANTS.py files. These files contain security implications with subprocesses and possible hardcoded passwords. I was able to learn the importance of Git Hooks and recording security weaknesses through this project. 
+
+**Trevor Aupperle**: I did part 4b - creating a fuzz.py file that fuzzed 5 different methods in the codebase. I used the big-list-of-naughty-strings from workshop 9 to fuzz the different methods. I then had the output errors from fuzzing outputed to a file called fuzzedErrors.txt. Secondly, I created a custom GitHub action called 'Fuzzing Analysis' to run the fuzz.py file everytime code is pushed to the repository. I learned that fuzzing methods in the code is important to see what could trigger an error. I also learned how to create a custom GitHub action that is able to run a python script. 

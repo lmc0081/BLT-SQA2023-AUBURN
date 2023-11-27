@@ -4,12 +4,16 @@ May 04, 2021
 Construct taint graphs based on weakness types 
 '''
 import constants
+from datetime import datetime
 import parser 
 import os 
 from itertools import combinations
-import ForesnicsLogger
+import ForensicsLogger
 
-foresnicLogger = ForesnicsLogger.createLoggerObj()
+forensicLogger = ForensicsLogger.createLoggerObj()
+forensicLogger.info("forensic logger has been initiated")
+forensicLogger.info("begin logging: ")
+
 
 #ADDED LOGGING HERE
 def getYAMLFiles(path_to_dir):
@@ -21,7 +25,8 @@ def getYAMLFiles(path_to_dir):
              if (full_p_file.endswith( constants.YAML_EXTENSION  ) or full_p_file.endswith( constants.YML_EXTENSION  )  ):
                valid_.append(full_p_file)
                #Adding logging statement for forensic tracking
-               foresnicLogger.info('Logging file access: %s', str(full_p_file))   
+               forensicLogger.info('file has been accessed and appended to list data structure: %s', str(full_p_file))   
+    forensicLogger.info('returning list, final list is: %s', str(valid_))
     return valid_ 
 
 def constructHelmString(hiera_tuple): 
@@ -37,10 +42,10 @@ def getHelmTemplateContent( templ_dir ):
     template_yaml_files =  getYAMLFiles( templ_dir )
     for template_yaml_file in template_yaml_files:
         value_as_str      = parser.readYAMLAsStr( template_yaml_file )
-        foresnicLogger.info('Logging file access (reading a yaml file): %s', str(value_as_str)) 
+        forensicLogger.info('file has been read: %s', str(template_yaml_file)) 
         template_content_dict[template_yaml_file] = value_as_str
+        forensicLogger.info('file has been added to dictionary data structure: %s', str(template_yaml_file)) 
     return template_content_dict 
-
 
 def getMatchingTemplates(path2script, hierarchy_ls):
     templ_list = [] 
@@ -122,14 +127,17 @@ def getSHFiles(path_to_dir):
              if (full_p_file.endswith( constants.SH_EXTENSION  )  ):
                valid_.append(full_p_file)
                #Adding logging statement for forensic tracking
-               foresnicLogger.info('Logging file access: %s', str(full_p_file))  
+               forensicLogger.info('file has been accessed and appended to list data structure: %s', str(full_p_file))   
+    forensicLogger.info('returning list, final list is: %s', str(valid_))
     return valid_ 
 
-
+#ADDED LOGGING HERE
 def readBashAsStr( path_sh_script ):
     _as_str = constants.YAML_SKIPPING_TEXT
     with open( path_sh_script , constants.FILE_READ_FLAG) as file_:
         _as_str = file_.read()
+    #Adding logging statement for forensic tracking
+    forensicLogger.info('Logging file access, reading file: %s', str(file_)) #_as_str
     return _as_str
 
 def getTaintsFromConfigMaps( script_path ):
@@ -172,7 +180,7 @@ def mineViolationGraph(path2script, yaml_dict, taint_value, k_ ):
     return templ_match_list
 
 
-#ADD LOGGING HERE
+#ADDED LOGGING HERE
 def mineServiceGraph( script_path, dict_yaml, src_val ): 
     '''
     This method looks at YAML files that have kind:Service , and checks if used in another YAML with kind:Deployment 
@@ -181,28 +189,27 @@ def mineServiceGraph( script_path, dict_yaml, src_val ):
     '''
     ret_lis = [] 
     svc_dir     = os.path.dirname( script_path )  + constants.SLASH_SYMBOL    
-    yaml_files  = getYAMLFiles( svc_dir )    
+    yaml_files  = getYAMLFiles( svc_dir )   
+    forensicLogger.info('list of yaml files retrieved: %s', str(yaml_files)) 
     for yaml_f in yaml_files:
         if( parser.checkIfValidK8SYaml( yaml_f ) ):
             dict_as_list   = parser.loadMultiYAML( yaml_f )
             sink_yaml_dict = parser.getSingleDict4MultiDocs( dict_as_list )                    
             sink_val_li_   = list(  parser.getValuesRecursively(sink_yaml_dict) )
             #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging file access: %s', str(yaml_f)) 
+            forensicLogger.info('Logging file access: %s', str(yaml_f)) 
             #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging data structure access (assigning a value): %s', str(dict_as_list))     
+            forensicLogger.info('Logging data structure access (assigning a value): %s', str(dict_as_list))     
             #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging data structure access (assigning a value): %s', str(sink_yaml_dict))                  
+            forensicLogger.info('Logging data structure access (assigning a value): %s', str(sink_yaml_dict))                  
             #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging data structure access (assigning a value): %s', str(sink_val_li_ ))
+            forensicLogger.info('Logging data structure access (assigning a value): %s', str(sink_val_li_ ))
             if( src_val in sink_val_li_ ) and ( constants.DEPLOYMENT_KW in sink_val_li_ ): 
                     sink_keys = parser.keyMiner(sink_yaml_dict, src_val)
                     if constants.K8S_APP_KW in sink_keys: 
                         ret_lis.append( (yaml_f, sink_keys  ) )
     return ret_lis 
 
-
-#ADD LOGGING HERE
 def mineNetPolGraph( script_, dict_y, src_val, src_keys ):
     '''
     Thsi method looks at YAML files that have kind: NetworkPoicy , and checks if used in another YAML
@@ -218,14 +225,6 @@ def mineNetPolGraph( script_, dict_y, src_val, src_keys ):
             dict_as_list   = parser.loadMultiYAML( yaml_f )
             sink_yaml_dict = parser.getSingleDict4MultiDocs( dict_as_list )
             sink_val_li_   = list(  parser.getValuesRecursively(sink_yaml_dict) )
-            #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging file access: %s', str(yaml_f)) 
-            #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging data structure access (assigning a value): %s', str(dict_as_list))     
-            #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging data structure access (assigning a value): %s', str(sink_yaml_dict))                  
-            #Adding logging statement for forensic tracking
-            foresnicLogger.info('Logging data structure access (assigning a value): %s', str(sink_val_li_ ))
             if( src_val in sink_val_li_ ) and ( (constants.DEPLOYMENT_KW in sink_val_li_) or (constants.POD_KW in sink_val_li_) ):  
                 sink_keys = parser.keyMiner(sink_yaml_dict, src_val)                
                 for sink_k in sink_keys:
@@ -233,5 +232,5 @@ def mineNetPolGraph( script_, dict_y, src_val, src_keys ):
                         lis2ret.append( ( src_val, sink_k ) ) 
     return lis2ret 
 
-
 # if __name__=='__main__':
+    

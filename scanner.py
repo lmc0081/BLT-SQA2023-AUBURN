@@ -493,7 +493,6 @@ def scanForRollingUpdates(path_script ):
                         dic[ cnt ] = [ constants.DEPLOYMENT_KW ]
     return dic     
 
-#ADD LOGGING HERE
 def scanForMissingNetworkPolicy(path_script ):
     dic, lis   = {}, []
     if ( parser.checkIfValidK8SYaml( path_script )  ): 
@@ -631,7 +630,6 @@ def scanDockerSock(path_script ):
                 dic[ cnt ] = []
     return dic  
 
-#LOG HERE maybe? the k8s_yaml.append and helm_chart.append
 def runScanner(dir2scan):
     all_content   = [] 
     all_yml_files = getYAMLFiles(dir2scan)
@@ -739,7 +737,7 @@ def runScanner(dir2scan):
 
     return all_content, sarif_json
 
-#ADD LOGGING HERE
+
 def scanForHostNetwork(path_script ):
     dic, lis   = {}, []
     if ( parser.checkIfValidK8SYaml( path_script )  ): 

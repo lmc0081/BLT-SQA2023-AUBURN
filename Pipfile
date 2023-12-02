@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 "ruamel.yaml" = "*"
+ruamel-yaml = "*"
 
 [dev-packages]
 
